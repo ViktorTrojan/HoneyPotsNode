@@ -7,6 +7,8 @@ const Config = {
         is_development: !isProduction!,
         is_production: isProduction!,
         ENV: process.env.NODE_ENV!,
+        RANDOM_LOGIN_CHANCE: parseInt(process.env.RANDOM_LOGIN_CHANCE!),
+        PORT: parseInt(process.env.PORT!),
     },
     db: {
         MYSQL_HOST: process.env.MYSQL_HOST!,
@@ -14,6 +16,9 @@ const Config = {
         MYSQL_USER: process.env.MYSQL_USER!,
         MYSQL_DB_NAME: process.env.MYSQL_DB_NAME!,
         MYSQL_PASSWORD: process.env.MYSQL_PASSWORD!,
+    },
+    logger: {
+        logpath: 'logs/',
     },
 };
 

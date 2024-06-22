@@ -1,0 +1,29 @@
+{
+  "name": "honeypot_ssh",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "aliases": {
+    "@": "build"
+  },
+  "scripts": {
+    "start": "npx tsx src/Main.ts",
+    "dev": "npx tsx watch src/Main.ts --ignore public/",
+    "production": "cross-env NODE_ENV=production node --loader esm-module-alias/loader --no-warnings build/Main.js",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.8",
+    "nodemon": "^3.1.4",
+    "tsx": "^4.15.7",
+    "typescript": "^5.5.2"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "esm-module-alias": "^2.2.0"
+  }
+}

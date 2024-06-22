@@ -1,0 +1,10 @@
+node_modules/
+src/config.json
+
+build
+
+.env*
+
+package-lock.json
+
+logs/*

@@ -17,6 +17,9 @@ const Config = {
         MYSQL_DB_NAME: process.env.MYSQL_DB_NAME!,
         MYSQL_PASSWORD: process.env.MYSQL_PASSWORD!,
     },
+    discord: {
+        DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK!
+    },
     logger: {
         logpath: 'logs/',
     },

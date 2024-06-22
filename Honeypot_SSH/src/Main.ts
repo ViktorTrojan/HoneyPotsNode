@@ -113,6 +113,44 @@ const commandResponses = [
     },
 ];
 
+function sendDiscordMsg(webhookUrl: string, username: string, password: string, ip: string, location: string): void {
+    try {
+        let color = 4145305; // blue
+        let symbol = "🔵";
+
+        const embed: any = {
+            title: `${symbol} Login Attempt`,
+            color: color,
+            fields: []
+        };
+        embed.fields.push({ name: "Username", value: username });
+        embed.fields.push({ name: "Password", value: password });
+        embed.fields.push({ name: "IP", value: ip });
+        embed.fields.push({ name: "Location", value: location });
+        const jsonPayload = { embeds: [embed] };
+
+        fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(jsonPayload)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => { })
+            .catch(error => {
+                Logger.log(`Error sending message: ${error}`, 'error');
+            });
+
+    } catch (error) { }
+}
+
 // Create SSH server
 const server = new ssh2.Server(config, (client: any) => {
     let clientIP = (client as any)._sock.remoteAddress;
@@ -121,10 +159,12 @@ const server = new ssh2.Server(config, (client: any) => {
     client.on('authentication', async (ctx) => {
         if (ctx.method === 'password') {
             const { username, password } = ctx;
-            Logger.log(`Login attempt [${clientIP}] [${username}] [${password}]`)
-
             let location = geoip.lookup(clientIP);
             let locationStr = location ? `Country [${location.country}] City [${location.city}] Area [${location.area}]` : 'Unknown';
+
+            Logger.log(`Login attempt [${clientIP}] [${username}] [${password}]`);
+            sendDiscordMsg(Config.discord.DISCORD_WEBHOOK, username, password, clientIP, locationStr);
+
             await DB.insert(login_attempts).values({ username, password, ip: clientIP, location: locationStr });
 
             if (Math.random() < Config.app.RANDOM_LOGIN_CHANCE) {
@@ -138,9 +178,7 @@ const server = new ssh2.Server(config, (client: any) => {
     });
 
     client.on('ready', () => {
-        console.log(`${client._sock.remoteAddress} >>> Authenticated (Not really of course :p)`);
-
-
+        Logger.log(`[${clientIP}] authenticated`);
 
         client.on('session', (accept, reject) => {
             const session = accept();

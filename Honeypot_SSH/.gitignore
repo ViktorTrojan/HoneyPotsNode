@@ -8,3 +8,5 @@ build
 package-lock.json
 
 logs/*
+
+docker-compose.yml

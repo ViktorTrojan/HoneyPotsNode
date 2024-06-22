@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  app:
+    build:
+      context: .
+    restart: always
+    ports:
+      - "22:2222"
+    depends_on:
+      - database
+    environment:
+      PORT: 2222
+      RANDOM_LOGIN_CHANCE: 0.001
+      DISCORD_WEBHOOK: https://discord.com/api/webhooks/
+      MYSQL_HOST: localhost
+      MYSQL_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_DB_NAME: honeypot_ssh
+      MYSQL_PASSWORD: pwhere
+    
+
+  database:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pwhere
+      MYSQL_DATABASE: honeypot_ssh
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  db-data:

@@ -21,5 +21,6 @@ RUN npm install --only=prod
 
 # Copy built code from the build stage
 COPY --from=build-stage /app/build ./build
+COPY --from=build-stage /app/host.key ./
 EXPOSE 9736
 CMD ["npm", "run", "production"]

@@ -6,6 +6,7 @@ import geoip from 'geoip-lite';
 import ssh2 from 'ssh2';
 import { DB } from './db/DB.js';
 import { executed_commands, login_attempts } from './db/Schema.js';
+import { Webhook, MessageBuilder } from 'discord-webhook-node';
 
 // SSH server configuration
 const config = {
@@ -114,41 +115,18 @@ const commandResponses = [
 ];
 
 function sendDiscordMsg(webhookUrl: string, username: string, password: string, ip: string, location: string): void {
-    try {
-        let color = 4145305; // blue
-        let symbol = "🔵";
+    const hook = new Webhook(webhookUrl);
 
-        const embed: any = {
-            title: `${symbol} Login Attempt`,
-            color: color,
-            fields: []
-        };
-        embed.fields.push({ name: "Username", value: username });
-        embed.fields.push({ name: "Password", value: password });
-        embed.fields.push({ name: "IP", value: ip });
-        embed.fields.push({ name: "Location", value: location });
-        const jsonPayload = { embeds: [embed] };
+    const embed = new MessageBuilder()
+        .setTitle('🔵 Login Attempt')
+        .setColor('#3342ff')
+        .addField('Username', username)
+        .addField('Password', password)
+        .addField('IP', ip)
+        .addField('Location', location)
+        .setTimestamp();
 
-        fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(jsonPayload)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => { })
-            .catch(error => {
-                Logger.log(`Error sending message: ${error}`, 'error');
-            });
-
-    } catch (error) { }
+    hook.send(embed);
 }
 
 // Create SSH server

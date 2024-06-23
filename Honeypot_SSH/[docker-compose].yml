@@ -12,8 +12,8 @@ services:
     environment:
       PORT: 2222
       RANDOM_LOGIN_CHANCE: 0.001
-      DISCORD_WEBHOOK: https://discord.com/api/webhooks/
-      MYSQL_HOST: localhost
+      DISCORD_WEBHOOK: 'https://discord.com/api/webhooks/'
+      MYSQL_HOST: database
       MYSQL_PORT: 3306
       MYSQL_USER: root
       MYSQL_DB_NAME: honeypot_ssh

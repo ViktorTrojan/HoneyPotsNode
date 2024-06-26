@@ -1,7 +1,10 @@
 node_modules/
 src/config.json
 
-build
+
+build/*
+
+src/db/migrations/*
 
 .env*
 

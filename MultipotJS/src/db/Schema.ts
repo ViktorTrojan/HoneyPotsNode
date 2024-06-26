@@ -22,4 +22,4 @@ export const attack = mysqlTable("attack", {
     created: datetime("created").default(sql`CURRENT_TIMESTAMP`).notNull(),
     fk_attacker: int("fk_attacker").references(() => attacker.id),
     fk_credential: int("fk_credential").references(() => credential.id)
-}, (t) => { return { pk: primaryKey({ columns: [t.fk_attacker, t.fk_credential] }) } });
+});

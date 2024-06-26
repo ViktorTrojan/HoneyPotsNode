@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+      "target": "es2020",
+      "module": "NodeNext",
+      "moduleResolution": "NodeNext",
+      "esModuleInterop": true,
+      "noImplicitAny": false,
+      "forceConsistentCasingInFileNames": true,
+      "skipLibCheck": true, // dont check libs for compilation
+      "strict": true,
+      "outDir": "build",
+      "baseUrl": "./src",
+      "paths": {
+        "@/*": ["./*"]
+      }
+    },
+    "exclude": ["node_modules"],
+    "include": ["src/**/*"]
+}

@@ -7,6 +7,8 @@ const Config = {
         is_development: !isProduction!,
         is_production: isProduction!,
         ENV: process.env.NODE_ENV!,
+
+        ABUSEIP_API_KEY: process.env.ABUSEIP_API_KEY!,
     },
     db: {
         MYSQL_HOST: process.env.MYSQL_HOST!,

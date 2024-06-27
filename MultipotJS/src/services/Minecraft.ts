@@ -49,22 +49,35 @@ export class Minecraft extends Service {
 
         // const Anvil = AnvilProvider.Anvil('1.16');
         // const World = PrismarineWorld('1.16');
-        // const anvil = new Anvil('C:\\Users\\Anix\\AppData\\Roaming\\.minecraft\\saves\\REGIONTEST');
-        // const world = new World(null, anvil);
-        // const x = 0; // Chunk coordinates
-        // const z = 0;
+        // const anvil = new Anvil('C:\\Users\\Anix\\AppData\\Roaming\\.minecraft\\saves\\prismarine\\N\\region');
+        // const world = new World(this.generateSimpleChunk, anvil);
+        const x = 0; // Chunk coordinates
+        const z = 0;
 
-        const schematic = await Schematic.read(await fs.readFileSync(__dirname + '/../../other/grief.schem'))
-        schematic.forEach((block, pos) => {
-            if(block.name != 'air') console.log(block)
-        });
-        // schematic.paste(world, new Vec3(2, 10, 14));
+        const Chunk = prismarineChunkLoader('1.16');
+        const chunk = new Chunk()
+        // let chunk2 = await world.getColumn(x, z);
+
+        // chunk.load(chunk2.dump(), 25, true);
+        chunk.load(await fs.readFileSync(__dirname + '/../../other/chunk.dump'), 25, true);
+        // const out = chunk.dump();
+        // console.log(chunk2.getMask())
+        // fs.writeFileSync(__dirname + '/../../other/chunk.mask', out);
+
+        // const schematic = await Schematic.read(await fs.readFileSync(__dirname + '/../../other/grief.schem'))
+        // // schematic.forEach((block, pos) => {
+        // //     if(block.name != 'air') {
+        // //         console.log(block)
+        // //         // chunk.setBlockType(new Vec3(pos.x+23, pos.y+30, pos.z+24), block.type)
+        // //         chunk.setBlockType(new Vec3(pos.x+15, pos.y+20, pos.z+16), block.type)
+        // //     }
+        // // });
+        // schematic.paste(world, new Vec3(15, 70, 0));
+        // schematic.paste(world, new Vec3(1, 1, 1));
+
+
 
         server.on('login', async (client) => {
-
-
-            // Load the chunk
-            let chunk = await world.getColumn(x, z);
 
             // Send the chunk to the client
             client.write('login', {
@@ -86,17 +99,17 @@ export class Minecraft extends Service {
             });
 
             client.write('position', {
-                x: 0,
-                y: 100,
-                z: 0,
+                x: 4,
+                y: 56,
+                z: 12,
                 yaw: 0,
-                pitch: 0,
+                pitch: 20,
                 flags: 0x00
             });
 
             client.write('map_chunk', {
-                x,
-                z,
+                x: 0,
+                z: 0,
                 groundUp: true,
                 biomes: chunk.dumpBiomes !== undefined ? chunk.dumpBiomes() : undefined,
                 heightmaps: {

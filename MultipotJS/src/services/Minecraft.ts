@@ -62,17 +62,17 @@ export class Minecraft extends Service {
         chunk.load(await fs.readFileSync(__dirname + '/../../other/chunk.dump'), 25, true);
 
 
-        for (let x = 0; x < 16; x++) {
-            for (let z = 0; z < 16; z++) {
-                for (let y = 0; y < 52; y++) {
-                chunk.setBlockType(new Vec3(x, 50, z), 0)
-                }
-            }
-        }
+        // for (let x = 0; x < 16; x++) {
+        //     for (let z = 0; z < 16; z++) {
+        //         for (let y = 0; y < 52; y++) {
+        //         chunk.setBlockType(new Vec3(x, 50, z), 0)
+        //         }
+        //     }
+        // }
 
         // const out = chunk.dump();
         // // console.log(chunk2.getMask())
-        // fs.writeFileSync(__dirname + '/../../other/chunk2.mask', out);
+        // fs.writeFileSync(__dirname + '/../../other/chunk3.dump', out);
 
         // const schematic = await Schematic.read(await fs.readFileSync(__dirname + '/../../other/grief.schem'))
         // // schematic.forEach((block, pos) => {

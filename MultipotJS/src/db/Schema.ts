@@ -17,7 +17,7 @@ export const credential = mysqlTable("credential", {
 
 // m-m relations
 
-export const attack = mysqlTable("attack", {
+export const attack = mysqlTable("attack", { // no primary key allows multiple foreign keys to point to the same result, in case an attacker tries the same user/pass on the same service, so we can count how many times it was tried and when it was tried
     service: varchar("service", { length: 20 }).notNull(),
     created: datetime("created").default(sql`CURRENT_TIMESTAMP`).notNull(),
     fk_attacker: int("fk_attacker").references(() => attacker.id),

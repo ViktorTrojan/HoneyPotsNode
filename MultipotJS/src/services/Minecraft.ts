@@ -9,7 +9,11 @@ import AnvilProvider from 'prismarine-provider-anvil';
 import PrismarineWorld from 'prismarine-world';
 import { Vec3 } from "vec3";
 import { Schematic } from 'prismarine-schematic'
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export class Minecraft extends Service {
     constructor({ enabled = false, reportip = false, discord_webhook }) {
@@ -43,16 +47,21 @@ export class Minecraft extends Service {
         const mcData = MinecraftData(server.version)
         const loginPacket = mcData.loginPacket
 
-        server.on('login', async (client) => {
-            const Anvil = AnvilProvider.Anvil('1.16');
-            const World = PrismarineWorld('1.16');
-            const anvil = new Anvil('C:\\Users\\Anix\\AppData\\Roaming\\.minecraft\\saves\\N\\region');
-            const world = new World(null, anvil);
-            const x = 0; // Chunk coordinates
-            const z = 0;
+        // const Anvil = AnvilProvider.Anvil('1.16');
+        // const World = PrismarineWorld('1.16');
+        // const anvil = new Anvil('C:\\Users\\Anix\\AppData\\Roaming\\.minecraft\\saves\\REGIONTEST');
+        // const world = new World(null, anvil);
+        // const x = 0; // Chunk coordinates
+        // const z = 0;
 
-            // const schematic = await Schematic.read(await fs.readFileSync('other/griefer.schem'))
-            // schematic.paste(world, new Vec3(0, 0, 0));
+        const schematic = await Schematic.read(await fs.readFileSync(__dirname + '/../../other/grief.schem'))
+        schematic.forEach((block, pos) => {
+            if(block.name != 'air') console.log(block)
+        });
+        // schematic.paste(world, new Vec3(2, 10, 14));
+
+        server.on('login', async (client) => {
+
 
             // Load the chunk
             let chunk = await world.getColumn(x, z);

@@ -36,7 +36,7 @@ export class Service {
     async start() { throw new Error('You have to implement the `start` method!'); } // IMPLEMENT THIS
 
     async reportIP(ip: string, categories: string, username?: string, password?: string) {
-        if (Config.app.is_development) return; // we dont want to report in development mode
+        if (Config.app.is_development || !this.reportip) return; // we dont want to report in development mode
 
         await DB.update(attacker).set({ reported: true }).where(eq(attacker.ip, ip));
 

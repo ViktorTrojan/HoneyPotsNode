@@ -7,7 +7,6 @@ import minecraftProtocol from 'minecraft-protocol';
 import { dirname } from "path";
 import prismarineChunkLoader, { PCChunk } from 'prismarine-chunk';
 import { fileURLToPath } from "url";
-import mcRandomPlayers from '../../other/mc_random_players.json'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,6 +29,9 @@ export class Minecraft extends Service {
     }
 
     async start() {
+        const mcRandomPlayersRead = await fs.readFileSync(__dirname + '/../../other/mc_random_players.json', 'utf8');
+        const mcRandomPlayers = JSON.parse(mcRandomPlayersRead);
+
         let currentResponse: MC_Status_Response;
         let randomStatusStartTime = new Date();
 

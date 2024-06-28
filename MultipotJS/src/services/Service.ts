@@ -4,7 +4,7 @@ import { attack, attacker, credential } from "@/db/Schema.js";
 import Logger from "@/util/Logger.js";
 import axios from "axios";
 import { Webhook, MessageBuilder } from 'discord-webhook-node';
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import geoip from 'geoip-lite';
 
 export interface ServiceProps {
@@ -53,6 +53,24 @@ export class Service {
         }
     }
 
+    // TODO: one function thats very customizeable and the other function should then use it internally 
+    async discord_send(title: string, msg: string, username: string, ip: string, location: string) {
+        if (!this.discord_webhook) return;
+
+        const hook = new Webhook(this.discord_webhook);
+
+        const embed = new MessageBuilder()
+            .setTitle(title)
+            .setColor('#f3423f')
+            .setDescription(msg)
+            .addField('Username', username)
+            .addField('IP', ip)
+            .addField('Location', location)
+            .setTimestamp();
+
+        hook.send(embed);
+    }
+
     async sendDiscordMsg(username: string, password: string, ip: string, location: string) {
         if (!this.discord_webhook) return;
 
@@ -68,6 +86,14 @@ export class Service {
             .setTimestamp();
 
         hook.send(embed);
+    }
+
+    // TODO: create a function that returns uniqueAttacks, then call it here and get the count
+    async db_uniqueAttackCount() { // get unique Attack count from this service
+        const result = await DB.select({
+            unique_attack_count: sql<number>`COUNT(DISTINCT ${attack.fk_credential})`.mapWith(Number)
+        }).from(attack).where(eq(attack.service, this.service_name));
+        return result[0]?.unique_attack_count ?? 0;
     }
 
     async saveDB_noCredentials(ip: string, location: string, reportCategories = '15') {
@@ -104,7 +130,7 @@ export class Service {
             credentialID = insertCredential[0].insertId;
         }
 
-        const insertAttack = await DB.insert(attack).values({ service: 'ssh', fk_attacker: attackerID, fk_credential: credentialID });
+        const insertAttack = await DB.insert(attack).values({ service: this.service_name, fk_attacker: attackerID, fk_credential: credentialID });
         if (insertAttack[0].affectedRows === 0) Logger.log("Could not insert Attack at " + this.service_name, 'error');
     }
 

@@ -7,9 +7,22 @@ import minecraftProtocol from 'minecraft-protocol';
 import { dirname } from "path";
 import prismarineChunkLoader, { PCChunk } from 'prismarine-chunk';
 import { fileURLToPath } from "url";
+import mcRandomPlayers from '../../other/mc_random_players.json'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+interface MC_Status_Response { // https://wiki.vg/Server_List_Ping#Status_Response
+    version: { name: string, protocol: number },
+    players: {
+        max: number,
+        online: number,
+        sample: [{ name: string, id: string }]
+    },
+    description: { text: string },
+    favicon: string,
+    previewsChat: boolean
+}
 
 export class Minecraft extends Service {
     constructor({ enabled = false, reportip = false, discord_webhook }) {
@@ -17,24 +30,53 @@ export class Minecraft extends Service {
     }
 
     async start() {
+        let currentResponse: MC_Status_Response;
+        let randomStatusStartTime = new Date();
+
         const server = minecraftProtocol.createServer({
-            motd: '\u00A7eMinecraft Survival SMP Server w Fr\u00A7ki\u00A7r\u00A7eends',
+            motd: '\u00A7eMinecraft Vanilla Survival SMP Server w Fr\u00A7ki\u00A7r\u00A7eends',
             'online-mode': true,
 
             port: 25565, // optional
             version: '1.16',
+            beforePing: (res: MC_Status_Response, client, callback_answerToPing) => {
+                const now = new Date();
+
+                if (!currentResponse || now.getTime() - randomStatusStartTime.getTime() > 30 * 60 * 1000) {// 30 minutes
+                    const randNum = Math.floor(Math.random() * 12) + 1; // between 1 and 12
+                    res.players.max = 20;
+                    res.players.online = randNum;
+
+                    // fill player array with random players
+                    const players: any = [];
+                    for (let i = 0; i < res.players.online; i++) {
+                        const randomIndex = Math.floor(Math.random() * mcRandomPlayers.length);
+                        players.push({ name: mcRandomPlayers[randomIndex].username, id: mcRandomPlayers[randomIndex].uuid, });
+                    }
+                    res.players.sample = players;
+
+                    currentResponse = res;
+                    randomStatusStartTime = new Date();
+                }
+
+                res = currentResponse; // at the end we want to set the response to the saved response
+                // respond to request
+                if (callback_answerToPing) { callback_answerToPing(null, res); }
+            },
         });
 
+        // @ts-ignore
         const mcData = MinecraftData(server.version)
         const loginPacket = mcData.loginPacket;
 
+        // @ts-ignore
         const Chunk = prismarineChunkLoader(server.version);
         const chunk: PCChunk = new Chunk()
         chunk.load(await fs.readFileSync(__dirname + '/../../other/chunk.dump'), 25, true);
 
         server.on('login', async (client) => {
             let fallCounter = 0;
-            const playerName = client.profile.name;
+            const playerName = client.profile?.name ?? 'offline';
             const clientIP = client.socket.remoteAddress!;
             let locationStr = this.ip2Loc(clientIP);
 
@@ -208,6 +250,28 @@ export class Minecraft extends Service {
                     client.write('respawn', loginParams());
 
                     setPosition();
+                }
+            });
+        });
+
+        // Listen for packets to capture handshake and ping
+        server.on('connection', (client) => {
+            // TODO: I think normal tcp connections can be captured here aswell
+            client.on('packet', (data, meta) => { // crafted packet to receive information about the server, used by serverscanners
+                if (meta.name === 'ping' || meta.name === 'set_protocol') {
+                    const clientIP = client.socket.remoteAddress!;
+                    let locationStr = this.ip2Loc(clientIP);
+                    if (meta.name === 'ping') {
+                        const msg = `Ping from IP: ${clientIP}`
+                        Logger.log(msg);
+                        this.discord_send('Ping', msg, '', clientIP, locationStr);
+                    } else if (meta.name === 'set_protocol') {
+                        const msg = `Handshake from IP: ${clientIP} with protocol version: ${data.protocolVersion}`;
+                        Logger.log(msg);
+                        this.discord_send('Handshake', msg, '', clientIP, locationStr);
+                    }
+
+                    this.saveDB_noCredentials(clientIP, locationStr);
                 }
             });
         });

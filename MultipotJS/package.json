@@ -13,14 +13,18 @@
     "build": "tsc",
     "db:generate": "drizzle-kit generate:mysql --schema src/db/Schema.ts --out=src/db/migrations",
     "db:migrate": "npx tsx src/db/Migrate.ts",
-    "db:seed": "npx tsx src/db/Seed.ts"
+    "db:seed": "npx tsx src/db/Seed.ts",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/node": "^20.14.8",
+    "jest": "^29.7.0",
     "nodemon": "^3.1.4",
+    "ts-jest": "^29.1.5",
     "tsx": "^4.15.7",
     "typescript": "^5.5.2"
   },
@@ -37,6 +41,7 @@
     "geoip-lite": "^1.4.10",
     "minecraft-data": "^3.66.0",
     "minecraft-protocol": "^1.47.0",
+    "minecraft-server-util": "^5.4.4",
     "mysql2": "^3.10.1",
     "prismarine-block": "^1.17.1",
     "prismarine-chunk": "^1.35.0",

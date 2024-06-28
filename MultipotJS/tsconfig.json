@@ -5,6 +5,7 @@
       "moduleResolution": "NodeNext",
       "esModuleInterop": true,
       "noImplicitAny": false,
+      "resolveJsonModule": true,
       "forceConsistentCasingInFileNames": true,
       "skipLibCheck": true, // dont check libs for compilation
       "strict": true,
@@ -12,7 +13,7 @@
       "baseUrl": "./src",
       "paths": {
         "@/*": ["./*"]
-      }
+      },
     },
     "exclude": ["node_modules"],
     "include": ["src/**/*"]
